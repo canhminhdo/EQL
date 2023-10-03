@@ -1,0 +1,249 @@
+fmod SCALAR is
+    pr CONVERSION .
+    pr EXT-BOOL .
+
+    sorts Comp iNumber .
+    subsort Float iNumber < Comp .
+
+    --- imaginary unit
+    op i : -> iNumber [ctor].
+
+    --- basic operators
+    op _.*_ : Comp Comp -> Comp [comm assoc prec 32] .
+    op _./_ : Comp Comp -> Comp [prec 31] .
+    op _.+_ : Comp Comp -> Comp [comm assoc prec 33] .
+    op (_)^* : Comp -> Comp [prec 30] .
+
+    --- error scalar
+    op errC : -> Comp .
+
+    --- some functions
+    op Sqrt : Comp -> Comp .
+    op Abs : Comp -> Comp .
+    op Pow : Comp Float -> Comp .
+
+    vars F F1 F2 : Float .
+    vars C C1 C2 C3 C4 : Comp .
+    var N : Nat .
+
+    --- imaginary properties
+    eq i .* i = -1.0 .
+    eq Abs(i) = 1.0 .
+    --- absolute values of a postive number is a positive number
+    eq Abs((Abs(C))) = Abs(C) .
+    eq Abs((Pow(Abs(C), F))) = Pow(Abs(C), F) .
+    --- owise
+    eq Abs(F) = abs(F) [owise] .
+
+    --- Pow properties
+    eq Pow(F1, F2) = (F1)^(F2) .
+
+    --- rational number calculation.
+    eq F1 .* F2 = F1 * F2 .
+    eq F1 ./ F2 = F1 / F2 .
+    eq F1 .+ F2 = F1 + F2 .
+
+    --- c . c* = |c|^2.0
+    eq C .* (C)^* = Pow(Abs(C), 2.0) .
+
+    --- distributive properties
+    eq C1 .* (C2 .+ C3) = C1 .* C2 .+ C1 .* C3 .
+
+    --- constructing normal form: F .* C
+    ceq (C .* F1 .+ C .* F2) = C .* (F1 .+ F2) if not C :: Float .
+    ceq C .+ F .* C = C .* (F .+ 1.0) if not C :: Float .
+    ceq C .+ C = C .* 2.0 if not C :: Float .
+
+    --- constructing normal form: C1 .* (1 ./ C2)
+    ceq C1 ./ C2 = C1 .* (1.0 ./ C2) if not C1 :: Float .
+    ceq F ./ C = F .* (1.0 ./ C) if not C :: Float /\ F =/= 1.0 .
+
+    --- multiplicative properties
+    eq C .* 1.0 = C .
+    eq C .* 0.0 = 0.0 .
+    ceq C .* (1.0 ./ C) = 1.0 if not C :: Float .
+    ceq (1.0 ./ C1) .* (1.0 ./ C2) = 1.0 ./ (C1 .* C2)
+    if not C1 :: Float /\ not C2 :: Float .
+    ceq C1 .* (1.0 ./ (C1 .* C2)) = 1.0 ./ C2
+    if not C1 :: Float /\ not C2 :: Float .
+
+    --- additive properties
+    eq C .+ 0.0 = C .
+
+    --- fraction properties
+    eq 0.0 ./ C = 0.0 .
+    eq C ./ 1.0 = C .
+    ceq C ./ 0.0 = errC if C =/= 0.0 .
+    eq 1.0 ./ (1.0 ./ C) =  C .
+    eq 1.0 ./ (C1 .* (1.0 ./ C2)) =  C2 .* (1.0 ./ C1) .
+    eq 1.0 ./ (C .* (F1 / F2)) =  (F2 / F1) .* (1.0 ./ C) .
+
+    --- Sqrt calculation
+    eq Sqrt(C) .* Sqrt(C) = C .
+    ceq Sqrt(1.0 ./ C) = 1.0 ./ Sqrt(C) if not C :: Float .
+    ceq Sqrt(C1 .* C2) = Sqrt(C1) .* Sqrt(C2) if not C1 :: Float or-else not C2 :: Float .
+    eq Sqrt(C) .* (F ./ C) = F .* (1.0 ./ Sqrt(C)) .
+    eq Sqrt(C1) .* (C2 / C1) = C2 .* (1.0 ./ Sqrt(C1)) .
+    eq Sqrt(Pow(Abs(C), 2.0)) = Abs(C) .
+    eq Sqrt(Pow(Pow(C, 2.0), 2.0)) = Pow(C, 2.0) .
+    eq Sqrt(- F) = i .* Sqrt(F) .
+    eq Sqrt(F1 / F2) = Sqrt(F1) .* (1.0 ./ Sqrt(F2)) .
+    eq Sqrt(1.0) = 1.0 .
+    eq Sqrt(0.0) = 0.0 .
+    --- eq Sqrt(F) = sqrt(F) [owise] .
+endfm
+
+fmod MATRIX is
+    pr SCALAR .
+
+    sorts Vector Matrix .
+
+    ops |0> |1> O : -> Vector .
+
+    ops |0><0| |0><1| |1><0| |1><1| : -> Matrix [ctor] .
+    op _._ : Comp Vector -> Vector [ctor prec 31] .
+    op _._ : Comp Matrix -> Matrix [ctor prec 31] .
+    op _+_ : Vector Vector -> Vector [ctor assoc comm prec 33] .
+    op _+_ : Matrix Matrix -> Matrix [assoc comm prec 33] .
+    op _x_ : Matrix Vector -> Vector [ctor prec 32 gather (e E)] .
+    op _x_ : Matrix Matrix -> Matrix [assoc prec 32 gather (e E)] .
+
+    vars C C1 C2 : Comp .
+    vars V V1 V2 : Vector .
+    vars M M1 M2 : Matrix .
+
+    eq [O1] : 0.0 . V = O .
+    eq [O2] : C . O = O .
+    eq [O3] : O + V = V .
+    eq [O4] : V + (-1.0 . V) = O .
+    eq [O5] : M x O = O .
+
+    --- [canh] scalar normal forms
+    eq [scalar-V1] : 1.0 . V = V .
+    --- [canh] additive normal forms
+    eq [add-V1] : V + V = 2.0 . V .
+    eq [add-V2] : (C . V) + V = (C .+ 1.0) . V .
+
+    --- _._ : Comp Vector -> Vector
+    eq [CV1] : C1 . (C2 . V) = (C1 .* C2) . V .
+    eq [CV2] : C . (V1 + V2) = C . V1 + C . V2 .
+
+    --- op _+_ : Vector Vector -> Vector [ctor comm assoc prec 33] .
+    --- always canonical form
+
+    --- op _x_ : Matrix Vector -> Vector [ctor prec 31] .
+    eq [MV1] : (C . M) x V = C . (M x V) .
+    eq [MV2] : (M1 + M2) x V = (M1 x V) + (M2 x V) .
+    eq [MV3] : (M1 x M2) x V = M1 x (M2 x V) .
+    eq [MV4] : M x (C . V) = C . (M x V) .
+    eq [MV5] : M x (V1 + V2) = (M x V1) + (M x V2) .
+
+    eq [Dist] : (C1 . V) + (C2 . V) = (C1 .+ C2) . V .
+
+    eq [1V] : 1.0 . V = V .
+    eq [MV000] : |0><0| x |0> = |0> .
+    eq [MV001] : |0><0| x |1> = O .
+    eq [MV010] : |0><1| x |0> = O .
+    eq [MV011] : |0><1| x |1> = |0> .
+    eq [MV100] : |1><0| x |0> = |1> .
+    eq [MV101] : |1><0| x |1> = O .
+    eq [MV110] : |1><1| x |0> = O .
+    eq [MV111] : |1><1| x |1> = |1> .
+endfm
+
+fmod TENSOR is
+    pr MATRIX .
+
+    op _(x)_ : Vector Vector -> Vector [ctor assoc prec 31] .
+    op _(x)_ : Matrix Matrix -> Matrix [ctor assoc prec 31] .
+
+    vars V V1 V2 V3 : Vector .
+    vars C : Comp .
+    vars M M1 M2 : Matrix .
+    
+    eq [Tensor1] : O (x) V = O .
+    eq [Tensor2] : V (x) O = O .
+    eq [Tensor3] : (V1 + V2) (x) V3 = (V1 (x) V3) + (V2 (x) V3) .
+    eq [Tensor4] : V1 (x) (V2 + V3) = (V1 (x) V2) + (V1 (x) V3) .
+    eq [Tensor5] : (C . V1) (x) V2 = C . (V1 (x) V2) .
+    eq [Tensor6] : V1 (x) (C . V2) = C . (V1 (x) V2) .
+    eq [Tensor7] : (M1 (x) M2) x (V1 (x) V2) = (M1 x V1) (x) (M2 x V2) .
+endfm
+
+fmod Q-ACTION is
+    pr TENSOR .
+
+    op I : -> Matrix [ctor] .
+    op I[_] : Nat -> Matrix .
+
+    var N N1 N2 N3 : Nat .
+    var C : Comp .
+    var V V1 V2 : Vector .
+    var M : Matrix .
+
+    eq [I1] : I x V = V .
+    eq [I2] : I[0] (x) M = M .
+    eq [I3] : M (x) I[0] = M .
+    ceq [I4] : I[N] = I (x) I[sd(N, 1)] if N >= 1 .
+
+    op size : Vector -> Nat .
+
+    eq [S1] : size(|0>) = 1 .
+    eq [S2] : size(|1>) = 1 .
+    eq [S3] : size(C . V) = size(V) .
+    eq [S4] : size(V1 + V2) = size(V1) .
+    eq [S5] : size(V1 (x) V2) = size(V1) + size(V2) .
+
+    ops P0 P1 X Y Z H S T SqrtX : Nat -> Matrix .
+    ops CX CZ SWAP : Nat Nat -> Matrix .
+    ops CCX CSWAP : Nat Nat Nat -> Matrix .
+
+    ceq [P0] : P0(N) x V = (I[N] (x) |0><0| (x) I[size(V) - N - 1]) x V if N <= size(V) - 1 .
+    ceq [P1] : P1(N) x V = (I[N] (x) |1><1| (x) I[size(V) - N - 1]) x V if N <= size(V) - 1 .
+    ceq [X] : X(N) x V = (I[N] (x) (|0><1| + |1><0|) (x) I[size(V) - N - 1]) x V if N <= size(V) - 1 .
+    ceq [Y] : Y(N) x V = (I[N] (x) (((-1.0) .* i) . |0><1| + i . |1><0|) (x) I[size(V) - N - 1]) x V if N <= size(V) - 1 .
+    ceq [Z] : Z(N) x V = (P0(N) + (-1.0) . P1(N)) x V if N <= size(V) - 1 .
+    ceq [H] : H(N) x V = (1.0 ./ Sqrt(2.0) . (X(N) + Z(N))) x V if N <= size(V) - 1 .
+    ceq [S] : S(N) x V = (P0(N) + (i . P1(N))) x V if N <= size(V) - 1 .
+    ceq [T] : T(N) x V = (P0(N) + ((1.0 + i) ./ Sqrt(2.0) . P1(N))) x V if N <= size(V) - 1 .
+    ceq [SqrtX] : SqrtX(N) x V = (P0(N) + ((1.0 + i) ./ Sqrt(2.0) . P1(N))) x V if N <= size(V) - 1 .
+    ceq [CX] : CX(N1, N2) x V = (P0(N1) + (P1(N1) x X(N2))) x V if N1 <= size(V) - 1 /\ N2 <= size(V) - 1 .
+    ceq [CZ] : CZ(N1, N2) x V = (P0(N1) + (P1(N1) x Z(N2))) x V if N1 <= size(V) - 1 /\ N2 <= size(V) - 1 .
+    ceq [SWAP] : SWAP(N1, N2) x V = (CX(N1, N2) x CX(N2, N1) x CX(N1, N2)) x V if N1 <= size(V) - 1 /\ N2 <= size(V) - 1 .
+    ceq [CCX] : CCX(N1, N2, N3) x V = (P0(N1) + (P1(N1) x CX(N2, N3))) x V if N1 <= size(V) - 1 /\ N2 <= size(V) - 1 /\ N3 <= size(V) - 1 .
+    ceq [CSWAP] : CSWAP(N1, N2, N3) x V = (CX(N2, N3) x CCX(N1, N2, N3) x CX(N2, N3)) x V if N1 <= size(V) - 1 /\ N2 <= size(V) - 1 /\ N3 <= size(V) - 1 .
+endfm
+
+fmod N is
+    pr Q-ACTION .
+    
+    sorts VList MList .
+
+    op nilV : -> VList .
+    op nilM : -> MList .
+    op _|_ : Vector VList -> VList .
+    op _|_ : Matrix MList -> MList .
+    op [_]_ : MList Vector -> VList .
+
+    var V : Vector .
+    var M : Matrix .
+    vars L L1 L2 : MList .
+
+    eq [nilM] V = nilV .
+    eq [M | L] V = (M x V) | [L] V .
+endfm
+
+fmod TELEPORT is
+    pr N .
+
+    ops c1 c2 : -> Comp .
+    op |psi> : -> Vector .
+
+    var C : Comp .
+
+    eq Pow(Abs(c1), 2.0) .+ Pow(Abs(c2), 2.0) = 1.0 .
+    eq C .* Pow(Abs(c1), 2.0) .+ C .* Pow(Abs(c2), 2.0) = C .
+    eq |psi> = c1 . |0> + c2 . |1> .
+endfm
+
+red [Z(2) x X(2) x P1(1) x P0(1) | Z(2) x P1(0) x P0(1) | X(2) x P1(1) x P0(0) | P1(0) x P0(0) | nilM] H(0) x CX(0,1) x CX(1,2) x H(1) x |psi> (x) |0> (x) |0> .
