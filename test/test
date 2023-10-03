@@ -1,0 +1,6 @@
+#!/bin/sh
+
+DIR=test
+cd ../ && maude < test.maude -no-banner -no-advise | sed -r '/^(rewrites:|Solution|states:)/d' > $DIR/test.out
+diff $DIR/test.expected $DIR/test.out
+rm $DIR/test.out

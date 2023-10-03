@@ -1,0 +1,39 @@
+==========================================
+fmod SCALAR
+==========================================
+fmod MATRIX
+==========================================
+fmod TENSOR
+==========================================
+fmod Q-ACTION
+==========================================
+fmod N
+==========================================
+fmod TELEPORT
+Reading in file: "debug.maude"
+Done reading in file: "debug.maude"
+==========================================
+reduce in TELEPORT : mSize(|1><1|) == 1 .
+result Bool: true
+==========================================
+reduce in TELEPORT : mSize(|1><1|(x)|0><1|) == 2 .
+result Bool: true
+==========================================
+reduce in TELEPORT : mSize(|1><1|(x)|0><1|(x)|1><0|) == 3 .
+result Bool: true
+==========================================
+reduce in TELEPORT : mSize(|1><1|(x)|0><1|(x)|1><0|(x)|1><1|) == 4 .
+result Bool: true
+==========================================
+reduce in TELEPORT : vSize(|1>) == 1 .
+result Bool: true
+==========================================
+reduce in TELEPORT : vSize(|0>(x)|1>) == 2 .
+result Bool: true
+==========================================
+reduce in TELEPORT : vSize(|0>(x)|0>(x)|1>) == 3 .
+result Bool: true
+==========================================
+reduce in TELEPORT : vSize(|0>(x)|0>(x)|1>(x)|1>) == 4 .
+result Bool: true
+Bye.
