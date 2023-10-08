@@ -156,11 +156,20 @@ fmod TENSOR is
 
     op _(x)_ : Vector Vector -> Vector [ctor assoc prec 31] .
     op _(x)_ : Matrix Matrix -> Matrix [ctor assoc prec 31] .
+    op errV : -> Vector [ctor] .
 
     vars V V1 V2 V3 : Vector .
     vars C : Comp .
     vars M M1 M2 : Matrix .
     
+    --- error Vector
+    eq [errV1] : C . errV = errV .
+    eq [errV2] : V + errV = errV .
+    eq [errV3] : M x errV = errV .
+    eq [errV4] : V (x) errV = errV .
+    eq [errV5] : errV (x) V = errV .
+
+    --- tensor
     eq [Tensor1] : O (x) V = O .
     eq [Tensor2] : V (x) O = O .
     eq [Tensor3] : (V1 + V2) (x) V3 = (V1 (x) V3) + (V2 (x) V3) .
@@ -168,26 +177,39 @@ fmod TENSOR is
     eq [Tensor5] : (C . V1) (x) V2 = C . (V1 (x) V2) .
     eq [Tensor6] : V1 (x) (C . V2) = C . (V1 (x) V2) .
     --- [canh] updated
-    ceq [Tensor7] : (M1 (x) M2) x (V1 (x) V2) = (M1 x V1) (x) (M2 x V2) 
-    if mSize(M1) == vSize(V1) /\ mSize(M2) == vSize(V2) .
+    ceq [Tensor7.1] : (M1 (x) M2) x (V1 (x) V2) = (M1 x V1) (x) (M2 x V2) 
+    if mSize(M1) =/= errNat /\ mSize(M2) =/= errNat
+    /\ mSize(M1) == vSize(V1) /\ mSize(M2) == vSize(V2) .
+    eq [Tensor7.2] : (M1 (x) M2) x V = errV [owise] .
+    eq [Tensor7.3] : M x (V1 (x) V2) = errV [owise] .
 
+    vars N N1 N2 : Nat .
+    op errNat : -> Nat [ctor] .
+    eq errNat + N = errNat .
+    eq errNat - N = errNat .
+    eq N - errNat = errNat .
+    
     --- size of Matrix
     op mSize : Matrix -> Nat .
-    eq mSize(C . M) = mSize(M) .
-    eq mSize(M1 + M2) = mSize(M1) .
-    eq mSize(M1 (x) M2) = mSize(M1) + mSize(M2) .
     eq mSize(|0><0|) = 1 .
     eq mSize(|0><1|) = 1 .
     eq mSize(|1><0|) = 1 .
     eq mSize(|1><1|) = 1 .
+    eq mSize(C . M) = mSize(M) .
+    ceq mSize(M1 + M2) = if N1 =/= N2 then errNat else N1 fi
+    if N1 := mSize(M1) /\ N2 := mSize(M2) .
+    ceq mSize(M1 x M2) = if N1 =/= N2 then errNat else N1 fi
+    if N1 := mSize(M1) /\ N2 := mSize(M2) .
+    eq mSize(M1 (x) M2) = mSize(M1) + mSize(M2) .
 
     --- size of Vector
     op vSize : Vector -> Nat .
-    eq vSize(C . V) = vSize(V) .
-    eq vSize(V1 + V2) = vSize(V1) .
-    eq vSize(V1 (x) V2) = vSize(V1) + vSize(V2) .
     eq vSize(|0>) = 1 .
     eq vSize(|1>) = 1 .
+    eq vSize(C . V) = vSize(V) .
+    ceq vSize(V1 + V2) = if N1 =/= N2 then errNat else N1 fi
+    if N1 := vSize(V1) /\ N2 := vSize(V2) .
+    eq vSize(V1 (x) V2) = vSize(V1) + vSize(V2) .
 endfm
 
 fmod Q-ACTION is
