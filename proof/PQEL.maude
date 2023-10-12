@@ -1,0 +1,57 @@
+in ../QEL.maude
+
+--- Proof: Lemma 3 (1) (The proof of Lemma 3 (2) is similar.)
+
+fmod BASE-CASE1 is
+    pr MATRIX .
+endfm
+
+red in BASE-CASE1 : |0><0| x |0> .
+red in BASE-CASE1 : |0><1| x |0> .
+red in BASE-CASE1 : |1><0| x |0> .
+red in BASE-CASE1 : |1><1| x |0> .
+
+fmod INDUCTION-CASE1 is
+    pr MATRIX .
+    ops C C0 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 : -> Comp .
+    ops M M1 M2 : -> Matrix .
+    --- hypothesis
+    eq M x |0> = (C0 . |0>) + (C1 . |1>) .
+    eq M x |1> = (C2 . |0>) + (C3 . |1>) .
+    eq M1 x |0> = (C4 . |0>) + (C5 . |1>) .
+    eq M1 x |1> = (C8 . |0>) + (C9 . |1>) .
+    eq M2 x |0> = (C6 . |0>) + (C7 . |1>) .
+    eq M2 x |1> = (C10 . |0>) + (C11 . |1>) .
+endfm
+
+red in INDUCTION-CASE1 : (C . M) x |0> .
+red in INDUCTION-CASE1 : (M1 + M2) x |0> .
+red in INDUCTION-CASE1 : (M1 x M2) x |0> .
+
+--- Proof: Theorem 1
+
+fmod BASE-CASE2 is
+    pr MATRIX .
+endfm
+
+red in BASE-CASE2 : O .
+red in BASE-CASE2 : |0> .
+red in BASE-CASE2 : |1> .
+
+fmod INDUCTION-CASE2 is
+    pr MATRIX .
+    ops C C0 C1 C2 C3 C4 C5 C6 C7 C8 C9 : -> Comp .
+    ops V V1 V2 : -> Vector .
+    op M : -> Matrix .
+    --- hypothesis
+    eq V = (C0 . |0>) + (C1 . |1>) .
+    eq V1 = (C2 . |0>) + (C3 . |1>) .
+    eq V2 = (C4 . |0>) + (C5 . |1>) .
+    --- Lemma 3
+    eq M x |0> = (C6 . |0>) + (C7 . |1>) .
+    eq M x |1> = (C8 . |0>) + (C9 . |1>) .
+endfm
+
+red in INDUCTION-CASE2 : C . V .
+red in INDUCTION-CASE2 : (V1 + V2) .
+red in INDUCTION-CASE2 : M x V .
