@@ -188,7 +188,7 @@ fmod TENSOR is
     eq errNat + N = errNat .
     eq errNat - N = errNat .
     eq N - errNat = errNat .
-    
+
     --- size of Matrix
     op mSize : Matrix -> Nat .
     eq mSize(|0><0|) = 1 .
@@ -204,6 +204,7 @@ fmod TENSOR is
 
     --- size of Vector
     op vSize : Vector -> Nat .
+    eq vSize(errV) = errNat .
     eq vSize(|0>) = 1 .
     eq vSize(|1>) = 1 .
     eq vSize(C . V) = vSize(V) .
@@ -228,14 +229,6 @@ fmod Q-ACTION is
     eq [I2] : I[0] (x) M = M .
     eq [I3] : M (x) I[0] = M .
     ceq [I4] : I[N] = I (x) I[sd(N, 1)] if N >= 1 .
-
-    op size : Vector -> Nat .
-
-    eq [S1] : size(|0>) = 1 .
-    eq [S2] : size(|1>) = 1 .
-    eq [S3] : size(C . V) = size(V) .
-    eq [S4] : size(V1 + V2) = size(V1) .
-    eq [S5] : size(V1 (x) V2) = size(V1) + size(V2) .
 
     ops P0 P1 X Y Z H S T SqrtX : Nat -> Matrix .
     ops CX CZ SWAP : Nat Nat -> Matrix .
@@ -271,10 +264,17 @@ fmod CHOICES is
     var V : Vector .
     var M : Matrix .
     vars L L1 L2 : MList .
-
+    var VL : VList .
 
     eq [nilM] V = nilV .
     eq [M | L] V = (M x V) | [L] V .
+
+    op eval : Vector -> Vector .
+    ceq eval(V) = errV if vSize(V) == errNat .
+
+    op eval : VList -> VList .
+    eq eval(V | VL) = eval(V) | eval(VL) .
+    eq eval(nilV) = nilV .
 endfm
 
 fmod TELEPORT is
@@ -292,9 +292,9 @@ endfm
 
 in debug.maude
 
-red [
+red eval([
     Z(2) x X(2) x P1(1) x P1(0) | 
     Z(2) x P0(1) x P1(0) | 
     X(2) x P1(1) x P0(0) | 
     P0(1) x P0(0) | nilM
-] H(0) x CX(0,1) x CX(1,2) x H(1) x |psi> (x) |0> (x) |0> .
+] H(0) x CX(0,1) x CX(1,2) x H(1) x |psi> (x) |0> (x) |0>) .
